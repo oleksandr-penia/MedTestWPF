@@ -1,0 +1,240 @@
+﻿<Window x:Class="MedTestWPF.PatientView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MedTestWPF"
+        mc:Ignorable="d"
+        Title="Вікно пацієнта" Height="720" Width="1500" FontSize="14">
+    <Window.Resources>
+        <!--<local:TestResultToImageSourceConverter x:Key="TestResultToImageSourceConverter"/>
+        <local:ButtonStyleConverter x:Key="ButtonStyleConverter"/>
+        <Style x:Key="HighlightableButton" TargetType="{x:Type CalendarDayButton}">
+            <Style.Triggers>
+                <DataTrigger Value="True">
+                    <DataTrigger.Binding>
+                        <MultiBinding Converter="{StaticResource ButtonStyleConverter}">
+                            <Binding />
+                            <Binding Path="DataContext.DatesOfTests" RelativeSource="{RelativeSource AncestorType=Calendar}" />
+                        </MultiBinding>
+                    </DataTrigger.Binding>
+                    <Setter Property="Background" Value="Red" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>-->
+    </Window.Resources>
+
+    <Grid Height="700" HorizontalAlignment="Center" Width="1500" VerticalAlignment="Top">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="38*"/>
+            <ColumnDefinition Width="38*"/>
+            <ColumnDefinition Width="24*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel x:Name="PatientName" Margin="5,10,169,527">
+            <TextBlock HorizontalAlignment="Left" Margin="5,5,0,0" TextWrapping="Wrap" Text="{Binding PatientFullName}" VerticalAlignment="Top" FontWeight="Bold" FontSize="24"/>
+            <TextBlock HorizontalAlignment="Left" Margin="5,10,0,0" TextWrapping="Wrap" Text="{Binding PatientAge}" VerticalAlignment="Top" FontSize="24"/>
+            <TextBlock HorizontalAlignment="Left" Margin="5,35,0,0" TextWrapping="Wrap" Text="ID пацієнта: " VerticalAlignment="Top" FontSize="24" FontStyle="Italic" FontWeight="Bold"/>
+            <TextBlock HorizontalAlignment="Left" Margin="160,-32,0,0" TextWrapping="Wrap" Text="{Binding PatientId}" VerticalAlignment="Top" FontSize="24" FontStyle="Italic"/>
+        </StackPanel>
+        <StackPanel Margin="10,184,270,0" Height="486" VerticalAlignment="Top">
+            <Border Margin="5,0,0,0" Padding="5" BorderThickness="1" BorderBrush="Black" Background="White" CornerRadius="20">
+                <StackPanel>
+                    <Image Height="28" Source="/Resources/Static/Images/SearchIcon.png" Stretch="Fill" Width="25" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                    <TextBox x:Name="Search" TextWrapping="Wrap" FontSize="20" BorderThickness="0" Padding="0,0,0,0" Margin="0,-28" Width="221" HorizontalAlignment="Right" Height="27" VerticalAlignment="Top" TextChanged="OnSearchTextBoxTextChanged">
+                        <TextBox.Background>
+                            <ImageBrush ImageSource="/Resources/Static/Images/SearchBG.png" AlignmentX="Left" Stretch="None" />
+                        </TextBox.Background>
+                    </TextBox>
+                </StackPanel>
+            </Border>
+            <Border BorderThickness="1" BorderBrush="Black" Margin="0,10,0,0">
+                <TextBlock TextWrapping="Wrap" Text="Розділ" TextAlignment="Center" FontSize="20" Background="#FFE6E6E6" FontWeight="Bold" />
+            </Border>
+            <ListBox ItemsSource="{Binding Areas}" Height="406" VerticalAlignment="Center" BorderThickness="1" BorderBrush="Black">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel Margin="5,5,0,0" >
+                            <Border CornerRadius="5" BorderThickness="1" Width="200" Height="31" BorderBrush="Black" Background="#FFE6E6E6">
+                                <Button BorderThickness="0" Content="{Binding Name}" Width="160" Height="30" FontSize="18" Background="#00000000"></Button>
+                            </Border>
+                            <Image HorizontalAlignment="Right" Margin="10" Width="30" Height="30">
+                                <Image.Style>
+                                    <Style>
+                                        <Setter Property="Image.Source" Value="/Resources/Static/Images/InactiveArea.png"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                <Setter Property="Image.Source" Value="/Resources/Static/Images/ActiveArea.png" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Image.Style>
+                            </Image>
+                        </DockPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+        <StackPanel Margin="0,184,20,0" Height="486" VerticalAlignment="Top" HorizontalAlignment="Right" Width="245">
+            <Border Margin="0,51,0,0" BorderBrush="Black" BorderThickness="1">
+                <TextBlock  TextWrapping="Wrap" Text="Дослідження" TextAlignment="Center" FontSize="20" Background="#FFE6E6E6" FontWeight="Bold" />
+            </Border>
+            <Border Margin="0,0,0,0" BorderBrush="Black" BorderThickness="1" Height="406">
+                <StackPanel>
+                    <Calendar SelectedDate="{Binding Path=SelectedDateTime, Mode=TwoWay}"  Margin="0,30,0,0" CalendarDayButtonStyle="{DynamicResource HighlightableButton}">
+
+                    </Calendar>
+                    <ListBox Margin="20,20,0,0" ItemsSource="{Binding AvailableTests}" VerticalAlignment="Center" BorderThickness="1" BorderBrush="Black" Width="200" SelectedItem="{Binding Path=SelectedTest, Mode=OneWayToSource}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Margin="0,5,0,5">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} {1}">
+                                            <Binding Path="FormattedTime" />
+                                            <Binding Path="Name" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                        <ListBox.Style>
+                            <Style TargetType="{x:Type ListBox}">
+                                <Style.Triggers>
+                                    <Trigger Property="HasItems" Value="False">
+                                        <Setter Property="Visibility" Value="Hidden"/>
+                                    </Trigger>
+                                    <Trigger Property="HasItems" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.Style>
+                    </ListBox>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+        <Image x:Name="QRCode" Source="/Resources/Dynamic/Images/qr1.png" Margin="425,20,25,526"/>
+        <Border Margin="5,20,40,644" Grid.Column="1" BorderBrush="Black" BorderThickness="1">
+            <TextBlock  TextWrapping="Wrap" Text="Діагнози" TextAlignment="Center" FontSize="20" Background="#FFE6E6E6" FontWeight="Bold"/>
+        </Border>
+        <Border Margin="5,56,40,383" Grid.Column="1" BorderBrush="Black" BorderThickness="1">
+            <StackPanel>
+                <DataGrid Margin="10,30,10,0" ItemsSource="{Binding Diagnoses}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeColumns="False" CanUserReorderColumns="False" CanUserSortColumns="False" CanUserResizeRows="False" IsHitTestVisible="False" Grid.Column="1" Height="162" VerticalAlignment="Top" Background="#FFE6E6E6" HeadersVisibility="Column" RowHeight="30">
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Height" Value="40"/>
+                            <Setter Property="Background" Value="#FFE6E6E6"/>
+                            <Setter Property="FontSize" Value="14"/>
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                            <Setter Property="FontWeight" Value="DemiBold"/>
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Діагноз" Binding="{Binding Path=Name}" Width="5*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Дата постановки" Binding="{Binding Path=FormattedDate}" Width="4*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Історія хвороби" Width="4*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="Відкрити"/>
+                                    <Setter Property="TextDecorations" Value="Underline"/>
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <Button Margin="10,20,0,0" Width="150" HorizontalAlignment="Left" Height="30" Content="Додати діагноз">
+                </Button>
+            </StackPanel>
+        </Border>
+
+        <Border Margin="5,350,40,309" Grid.Column="1" BorderBrush="Black" BorderThickness="1">
+            <TextBlock TextWrapping="Wrap" Text="Картка дослідження" TextAlignment="Center" FontSize="20" Background="#FFE6E6E6" FontWeight="Bold"/>
+        </Border>
+        <Border Margin="5,390,40,30" Grid.Column="1" BorderBrush="Black" BorderThickness="1">
+            <StackPanel>
+                <RadioButton Margin="10,10,0,0" Content="Опис" IsChecked="{Binding Path=ShowTestDescription, Mode=TwoWay}">
+                </RadioButton>
+                <RadioButton Margin="10,10,0,0" Content="Зображення" IsChecked="{Binding Path=ShowTestImage, Mode=TwoWay}">
+                </RadioButton>
+                <Image Margin="20,20,20,0" Height="170" Width="492" HorizontalAlignment="Left" Source="{Binding Path=SelectedTestImage}">
+                    <Image.Style>
+                        <Style TargetType="{x:Type Image}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ShowTestImage}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ShowTestImage}" Value="False">
+                                    <Setter Property="Visibility" Value="Hidden"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Image.Style>
+                </Image>
+                <TextBlock TextWrapping="Wrap" Margin="20,-170,20,10" Text="{Binding Path=SelectedTestDescription}">
+                    <TextBlock.Style>
+                        <Style TargetType="{x:Type TextBlock}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ShowTestDescription}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ShowTestDescription}" Value="False">
+                                    <Setter Property="Visibility" Value="Hidden"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </StackPanel>
+        </Border>
+        <Border Margin="-15,21,5,645" Grid.Column="2" BorderBrush="Black" BorderThickness="1">
+            <TextBlock TextWrapping="Wrap" Text="Динаміка показників" TextAlignment="Center" FontSize="20" Background="#FFE6E6E6" FontWeight="Bold" />
+        </Border>
+        <Border Margin="-15,55,5,383" Grid.Column="2" BorderBrush="Black" BorderThickness="1" >
+            <StackPanel>
+                <ComboBox ItemsSource="{Binding Path=MeasurementTypes}" SelectedItem="{Binding Path=SelectedMeasurementType, Mode=TwoWay}" Margin="10,10,10,10" Height="25">
+                </ComboBox>
+                <StackPanel Height="220" HorizontalAlignment="Left" Orientation="Horizontal" Width="363">
+                    <ListBox ItemsSource="{Binding Path=TestResults}" Margin="5,10,0,10" Width = "125">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel>
+                                    <TextBlock Text="{Binding Path=PillName}" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center" Width="105">
+                                    </TextBlock>
+                                    <Image Margin="-4,0,0,0" Width="10" Height="10" Source="{Binding Path=ImagePath}" ToolTip="{Binding Path=ToolTipText}" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                    </Image>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <WpfPlot Name="MeasurementsPlot" Margin="10,10,100,10" Width="218">
+
+                    </WpfPlot>
+                </StackPanel>
+
+            </StackPanel>
+        </Border>
+
+        <Border Margin="-15,350,5,309" Grid.Column="2" BorderBrush="Black" BorderThickness="1">
+            <TextBlock Margin="0" Height="35" TextWrapping="Wrap" Text="Семантично пов'язані дослідження" TextAlignment="Center" FontSize="18" Background="#FFE6E6E6" FontWeight="Bold" />
+        </Border>
+        <Border Margin="-15,390,5,30" Grid.Column="2" BorderBrush="Black" BorderThickness="1">
+            <Image Margin="10,10,10,100" Source="/Resources/Static/Images/TableGraph.png"/>
+        </Border>
+    </Grid>
+</Window>
